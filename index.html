@@ -205,22 +205,22 @@
                 let pdfWidth = imgWidth;
                 let pdfHeight = imgHeight;
 
-                if (imgWidth > maxWidth || imgHeight > maxHeight) {
-                    const widthRatio = maxWidth / imgWidth;
-                    const heightRatio = maxHeight / imgHeight;
+                if (rotationDegree === 90 || rotationDegree === 270) {
+                    [pdfWidth, pdfHeight] = [pdfHeight, pdfWidth];
+                }
+
+                if (pdfWidth > maxWidth || pdfHeight > maxHeight) {
+                    const widthRatio = maxWidth / pdfWidth;
+                    const heightRatio = maxHeight / pdfHeight;
                     const scale = Math.min(widthRatio, heightRatio);
-                    pdfWidth = imgWidth * scale;
-                    pdfHeight = imgHeight * scale;
+                    pdfWidth = pdfWidth * scale;
+                    pdfHeight = pdfHeight * scale;
                 }
 
                 let xPos = (pdf.internal.pageSize.getWidth() - pdfWidth) / 2;
                 let yPos = (pdf.internal.pageSize.getHeight() - pdfHeight) / 2;
 
-                if (rotationDegree !== 0) {
-                    pdf.addImage(imgData, 'JPEG', xPos, yPos, pdfWidth, pdfHeight, undefined, 'SLOW', -rotationDegree);
-                } else {
-                    pdf.addImage(imgData, 'JPEG', xPos, yPos, pdfWidth, pdfHeight);
-                }
+                pdf.addImage(imgData, 'JPEG', xPos, yPos, pdfWidth, pdfHeight, undefined, 'SLOW', -rotationDegree);
 
                 // Third Page: Blank
                 pdf.addPage();
