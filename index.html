@@ -203,29 +203,28 @@ pdf.addPage();
 const pageWidth = pdf.internal.pageSize.getWidth();
 const pageHeight = pdf.internal.pageSize.getHeight();
 
-const maxWidth = pageWidth - 40; // Increased margin for more padding
-const maxHeight = pageHeight - 40; // Increased margin for more padding
+// Assuming imgWidth and imgHeight are the original dimensions of the image
 let pdfWidth = imgWidth;
 let pdfHeight = imgHeight;
 
+// Adjust the dimensions based on the rotation
 if (rotationDegree === 90 || rotationDegree === 270) {
     [pdfWidth, pdfHeight] = [pdfHeight, pdfWidth];
 }
 
-// Scale the image to fit within the page bounds
-if (pdfWidth > maxWidth || pdfHeight > maxHeight) {
-    const widthRatio = maxWidth / pdfWidth;
-    const heightRatio = maxHeight / pdfHeight;
-    const scale = Math.min(widthRatio, heightRatio);
-    pdfWidth = pdfWidth * scale;
-    pdfHeight = pdfHeight * scale;
-}
+// Scale the image to fit exactly within the page
+const widthRatio = pageWidth / pdfWidth;
+const heightRatio = pageHeight / pdfHeight;
+const scale = Math.min(widthRatio, heightRatio);
 
-// Center the image on the page
+pdfWidth = pdfWidth * scale;
+pdfHeight = pdfHeight * scale;
+
 const xPos = (pageWidth - pdfWidth) / 2;
 const yPos = (pageHeight - pdfHeight) / 2;
 
 pdf.addImage(imgData, 'JPEG', xPos, yPos, pdfWidth, pdfHeight, undefined, 'SLOW', -rotationDegree);
+
 
 
 
