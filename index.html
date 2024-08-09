@@ -116,40 +116,61 @@
         reader.onload = function(e) {
             const imgData = e.target.result;
 
-            const pdf = new jsPDF();
-            pdf.setFontSize(12);
-            pdf.text(`Name: ${name}`, 10, 10);
-            pdf.text(`Country Code: ${countryCode}`, 10, 20);
-            pdf.text(`Number: ${number}`, 10, 30);
-            pdf.text(`Batch: ${batch}`, 10, 40);
-            pdf.text(`Section: ${section}`, 10, 50);
-            pdf.text(`Subject: ${subject}`, 10, 60);
-            pdf.text(`Doubt in Detail: ${doubtDetail}`, 10, 70);
+            // Create an image element to get the original dimensions
+            const img = new Image();
+            img.src = imgData;
+            img.onload = function() {
+                const imgWidth = img.width;
+                const imgHeight = img.height;
 
-            if (imgData) {
-                pdf.addImage(imgData, 'JPEG', 10, 80, 180, 100);
-            }
+                const maxWidth = 180; // Max width for the image in PDF
+                const maxHeight = 100; // Max height for the image in PDF
+                let pdfWidth = imgWidth;
+                let pdfHeight = imgHeight;
 
-            // Add the logo to the top right corner of the first page
-            const logoUrl = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR1eujsjYJaW7lkJc3eVXYghPmxx73NDlRkPg&s'; // Replace with the correct path
-            pdf.addImage(logoUrl, 'PNG', 150, 10, 40, 15); // Adjust the coordinates and size as needed
+                // Resize maintaining the aspect ratio
+                if (imgWidth > maxWidth || imgHeight > maxHeight) {
+                    const widthRatio = maxWidth / imgWidth;
+                    const heightRatio = maxHeight / imgHeight;
+                    const scale = Math.min(widthRatio, heightRatio);
+                    pdfWidth = imgWidth * scale;
+                    pdfHeight = imgHeight * scale;
+                }
 
-            pdf.text('Please solve below:', 10, 190);
-            pdf.line(10, 195, 200, 195);  // Adds a line for solving space
-            pdf.line(10, 205, 200, 205);
-            pdf.line(10, 215, 200, 215);
+                const pdf = new jsPDF();
+                pdf.setFontSize(12);
+                pdf.text(`Name: ${name}`, 10, 10);
+                pdf.text(`Country Code: ${countryCode}`, 10, 20);
+                pdf.text(`Number: ${number}`, 10, 30);
+                pdf.text(`Batch: ${batch}`, 10, 40);
+                pdf.text(`Section: ${section}`, 10, 50);
+                pdf.text(`Subject: ${subject}`, 10, 60);
+                pdf.text(`Doubt in Detail: ${doubtDetail}`, 10, 70);
 
-            // Add a completely blank second page
-            pdf.addPage();
-            
-            // Convert the PDF to a Blob and trigger download
-            const blob = pdf.output('blob');
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${name}_question.pdf`;
-            a.click();
-            URL.revokeObjectURL(url); // Clean up
+                // Add the resized image
+                pdf.addImage(imgData, 'JPEG', 10, 80, pdfWidth, pdfHeight);
+
+                // Add the logo to the top right corner of the first page
+                const logoUrl = '/mnt/data/PW Gulf_White Logo YT.png'; // Replace with the correct path
+                pdf.addImage(logoUrl, 'PNG', 150, 10, 40, 15); // Adjust the coordinates and size as needed
+
+                pdf.text('Please solve below:', 10, 190);
+                pdf.line(10, 195, 200, 195);  // Adds a line for solving space
+                pdf.line(10, 205, 200, 205);
+                pdf.line(10, 215, 200, 215);
+
+                // Add a completely blank second page
+                pdf.addPage();
+                
+                // Convert the PDF to a Blob and trigger download
+                const blob = pdf.output('blob');
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${name}_question.pdf`;
+                a.click();
+                URL.revokeObjectURL(url); // Clean up
+            };
         };
         reader.readAsDataURL(imageFile);
     });
