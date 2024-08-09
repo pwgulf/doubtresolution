@@ -59,6 +59,18 @@
         #previewImage {
             max-width: 100%;
             height: auto;
+            transform-origin: center;
+        }
+        #rotateButton {
+            display: none;
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #ff7f50;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
         }
         #sendButton {
             display: none;
@@ -111,11 +123,7 @@
             <input type="file" id="image" accept="image/*" required>
         </div>
         <div class="form-group">
-            <label for="rotate">Rotate Image 90°</label>
-            <input type="checkbox" id="rotate">
-        </div>
-        <div class="form-group">
-            <input type="button" id="previewButton" value="Generate PDF">
+            <input type="button" id="previewButton" value="Generate Preview">
         </div>
     </form>
 </div>
@@ -123,30 +131,32 @@
 <div id="previewContainer">
     <h2>Preview</h2>
     <img id="previewImage" src="" alt="Image Preview">
+    <button id="rotateButton">Rotate Image 90°</button>
     <button id="sendButton">Send and Download PDF</button>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
 <script>
+    let rotationDegree = 0;
+
     document.getElementById('previewButton').addEventListener('click', function(event) {
         const imageFile = document.getElementById('image').files[0];
-        const rotate = document.getElementById('rotate').checked;
 
         const reader = new FileReader();
         reader.onload = function(e) {
             const imgData = e.target.result;
-            document.getElementById('previewImage').src = imgData;
+            const previewImage = document.getElementById('previewImage');
+            previewImage.src = imgData;
             document.getElementById('previewContainer').style.display = 'block';
-
-            if (rotate) {
-                document.getElementById('previewImage').style.transform = 'rotate(90deg)';
-            } else {
-                document.getElementById('previewImage').style.transform = 'none';
-            }
-
-            document.getElementById('sendButton').style.display = 'block';
+            document.getElementById('rotateButton').style.display = 'inline-block';
+            document.getElementById('sendButton').style.display = 'inline-block';
         };
         reader.readAsDataURL(imageFile);
+    });
+
+    document.getElementById('rotateButton').addEventListener('click', function(event) {
+        rotationDegree = (rotationDegree + 90) % 360;
+        document.getElementById('previewImage').style.transform = `rotate(${rotationDegree}deg)`;
     });
 
     document.getElementById('sendButton').addEventListener('click', function(event) {
@@ -159,7 +169,6 @@
         const section = document.getElementById('section').value;
         const subject = document.getElementById('subject').value;
         const doubtDetail = document.getElementById('doubtDetail').value;
-        const rotate = document.getElementById('rotate').checked;
         const imageFile = document.getElementById('image').files[0];
 
         const reader = new FileReader();
@@ -190,8 +199,8 @@
                 let xPos = (pdf.internal.pageSize.getWidth() - pdfWidth) / 2;
                 let yPos = 80;
 
-                if (rotate) {
-                    pdf.addImage(imgData, 'JPEG', xPos, yPos, pdfWidth, pdfHeight, undefined, 'SLOW', -90);
+                if (rotationDegree !== 0) {
+                    pdf.addImage(imgData, 'JPEG', xPos, yPos, pdfWidth, pdfHeight, undefined, 'SLOW', -rotationDegree);
                 } else {
                     pdf.addImage(imgData, 'JPEG', xPos, yPos, pdfWidth, pdfHeight);
                 }
@@ -206,7 +215,7 @@
                 pdf.text(`Doubt in Detail: ${doubtDetail}`, 10, 70);
 
                 // Add the logo to the top right corner of the first page
-                const logoUrl = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSZQ1weZmDB9mUB7UEieqPS3YcFG0GxSoTcfCFfzkQZBWTEg69UJgLvmC_81iC8ad9GDA&usqp=CAU'; // Replace with the correct path
+                const logoUrl = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSZQ1weZmDB9mUB7UEieqPS3YcFG0GxSoTcfCFfzkQZBWTEg69UJgLvmC_81iC8ad9GDA&usqp=CAU/mnt/data/PW Gulf_White Logo YT.png'; // Replace with the correct path
                 pdf.addImage(logoUrl, 'PNG', pdf.internal.pageSize.getWidth() - 50, 10, 40, 15); // Adjust the coordinates and size as needed
 
                 pdf.text('Please solve below:', 10, yPos + pdfHeight + 20);
