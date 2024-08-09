@@ -33,7 +33,7 @@
             display: block;
             margin-bottom: 5px;
         }
-        .form-group input[type="text"], .form-group input[type="file"] {
+        .form-group input[type="text"], .form-group input[type="file"], .form-group input[type="checkbox"] {
             width: 100%;
             padding: 8px;
             box-sizing: border-box;
@@ -50,6 +50,26 @@
         }
         .form-group input[type="submit"]:hover {
             background-color: #0056b3;
+        }
+        #previewContainer {
+            display: none;
+            margin-top: 20px;
+            text-align: center;
+        }
+        #previewImage {
+            max-width: 100%;
+            height: auto;
+        }
+        #sendButton {
+            display: none;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #28a745;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
         }
     </style>
 </head>
@@ -91,16 +111,45 @@
             <input type="file" id="image" accept="image/*" required>
         </div>
         <div class="form-group">
-            <input type="submit" value="Generate PDF">
+            <label for="rotate">Rotate Image 90°</label>
+            <input type="checkbox" id="rotate">
+        </div>
+        <div class="form-group">
+            <input type="button" id="previewButton" value="Generate PDF">
         </div>
     </form>
 </div>
 
+<div id="previewContainer">
+    <h2>Preview</h2>
+    <img id="previewImage" src="" alt="Image Preview">
+    <button id="sendButton">Send and Download PDF</button>
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
 <script>
-    document.getElementById('questionForm').addEventListener('submit', function(event) {
-        event.preventDefault();
-        
+    document.getElementById('previewButton').addEventListener('click', function(event) {
+        const imageFile = document.getElementById('image').files[0];
+        const rotate = document.getElementById('rotate').checked;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const imgData = e.target.result;
+            document.getElementById('previewImage').src = imgData;
+            document.getElementById('previewContainer').style.display = 'block';
+
+            if (rotate) {
+                document.getElementById('previewImage').style.transform = 'rotate(90deg)';
+            } else {
+                document.getElementById('previewImage').style.transform = 'none';
+            }
+
+            document.getElementById('sendButton').style.display = 'block';
+        };
+        reader.readAsDataURL(imageFile);
+    });
+
+    document.getElementById('sendButton').addEventListener('click', function(event) {
         const { jsPDF } = window.jspdf;
 
         const name = document.getElementById('name').value;
@@ -110,6 +159,7 @@
         const section = document.getElementById('section').value;
         const subject = document.getElementById('subject').value;
         const doubtDetail = document.getElementById('doubtDetail').value;
+        const rotate = document.getElementById('rotate').checked;
         const imageFile = document.getElementById('image').files[0];
 
         const reader = new FileReader();
@@ -122,25 +172,13 @@
                 const imgWidth = img.width;
                 const imgHeight = img.height;
 
-                // Default orientation is portrait
-                let pdfOrientation = 'p';
-                let pdf = new jsPDF(pdfOrientation);
-
-                // Determine orientation based on image dimensions
-                if (imgHeight > imgWidth) {
-                    // Ensure image is handled as vertical
-                    pdf = new jsPDF('p', 'mm', 'a4');
-                } else {
-                    // Ensure image is handled as horizontal
-                    pdf = new jsPDF('l', 'mm', 'a4');
-                }
+                let pdf = new jsPDF();
 
                 const maxWidth = pdf.internal.pageSize.getWidth() - 20; // Allowing some margin
                 const maxHeight = pdf.internal.pageSize.getHeight() - 100; // Allowing some margin and space for text
                 let pdfWidth = imgWidth;
                 let pdfHeight = imgHeight;
 
-                // Resize maintaining the aspect ratio
                 if (imgWidth > maxWidth || imgHeight > maxHeight) {
                     const widthRatio = maxWidth / imgWidth;
                     const heightRatio = maxHeight / imgHeight;
@@ -149,9 +187,14 @@
                     pdfHeight = imgHeight * scale;
                 }
 
-                // Calculate position to center the image
-                const xPos = (pdf.internal.pageSize.getWidth() - pdfWidth) / 2;
-                const yPos = 80; // Fixed position from top
+                let xPos = (pdf.internal.pageSize.getWidth() - pdfWidth) / 2;
+                let yPos = 80;
+
+                if (rotate) {
+                    pdf.addImage(imgData, 'JPEG', xPos, yPos, pdfWidth, pdfHeight, undefined, 'SLOW', -90);
+                } else {
+                    pdf.addImage(imgData, 'JPEG', xPos, yPos, pdfWidth, pdfHeight);
+                }
 
                 pdf.setFontSize(12);
                 pdf.text(`Name: ${name}`, 10, 10);
@@ -162,9 +205,6 @@
                 pdf.text(`Subject: ${subject}`, 10, 60);
                 pdf.text(`Doubt in Detail: ${doubtDetail}`, 10, 70);
 
-                // Add the image with correct orientation and dimensions
-                pdf.addImage(imgData, 'JPEG', xPos, yPos, pdfWidth, pdfHeight);
-
                 // Add the logo to the top right corner of the first page
                 const logoUrl = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSZQ1weZmDB9mUB7UEieqPS3YcFG0GxSoTcfCFfzkQZBWTEg69UJgLvmC_81iC8ad9GDA&usqp=CAU'; // Replace with the correct path
                 pdf.addImage(logoUrl, 'PNG', pdf.internal.pageSize.getWidth() - 50, 10, 40, 15); // Adjust the coordinates and size as needed
@@ -172,10 +212,8 @@
                 pdf.text('Please solve below:', 10, yPos + pdfHeight + 20);
                 pdf.line(10, yPos + pdfHeight + 25, pdf.internal.pageSize.getWidth() - 10, yPos + pdfHeight + 25);  // Adds a line for solving space
 
-                // Add a completely blank second page
                 pdf.addPage();
-                
-                // Convert the PDF to a Blob and trigger download
+
                 const blob = pdf.output('blob');
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
