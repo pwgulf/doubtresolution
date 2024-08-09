@@ -4,7 +4,115 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generate Question PDF</title>
-    
+    <style>
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f4f4f4;
+}
+
+.container {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px; /* Increased max-width for better layout on larger screens */
+    box-sizing: border-box;
+}
+
+.container h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    text-align: center; /* Centered heading */
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold; /* Added bold font for better readability */
+}
+
+.form-group input[type="text"], 
+.form-group input[type="file"], 
+.form-group input[type="checkbox"] {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+    border: 1px solid #ddd; /* Added border for better input visibility */
+    border-radius: 4px;
+}
+
+.form-group input[type="file"] {
+    padding: 3px; /* Reduced padding for file input */
+}
+
+.form-group input[type="submit"] {
+    width: 100%;
+    padding: 12px; /* Slightly increased padding for better touch targets */
+    background-color: #007bff;
+    border: none;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+}
+
+.form-group input[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+#previewContainer {
+    display: none;
+    margin-top: 20px;
+    text-align: center;
+}
+
+#previewImage {
+    max-width: 100%;
+    height: auto;
+    transform-origin: center;
+    margin: 0 auto; /* Center image horizontally */
+    display: block; /* Ensure the image is a block element */
+}
+
+#rotateButton, #sendButton {
+    display: none;
+    margin-top: 10px;
+    padding: 10px 20px;
+    background-color: #ff7f50;
+    border: none;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 4px;
+    width: calc(100% - 40px); /* Ensure buttons do not overflow */
+    margin: 10px auto; /* Center buttons */
+    transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+}
+
+#sendButton {
+    background-color: #28a745;
+}
+
+#rotateButton:hover {
+    background-color: #ff4500;
+}
+
+#sendButton:hover {
+    background-color: #218838;
+}
+</style>
 </head>
 <body>
 
@@ -124,29 +232,28 @@ pdf.addPage();
 const pageWidth = pdf.internal.pageSize.getWidth();
 const pageHeight = pdf.internal.pageSize.getHeight();
 
-const maxWidth = pageWidth - 2; // Allowing some margin
-const maxHeight = pageHeight - 2; // Allowing some margin
+// Assume imgWidth and imgHeight are the original dimensions of the image
 let pdfWidth = imgWidth;
 let pdfHeight = imgHeight;
 
+// Adjust dimensions based on rotation
 if (rotationDegree === 90 || rotationDegree === 270) {
     [pdfWidth, pdfHeight] = [pdfHeight, pdfWidth];
 }
 
-// Scale the image to fit within the page bounds
-if (pdfWidth > maxWidth || pdfHeight > maxHeight) {
-    const widthRatio = maxWidth / pdfWidth;
-    const heightRatio = maxHeight / pdfHeight;
-    const scale = Math.min(widthRatio, heightRatio);
-    pdfWidth = pdfWidth * scale;
-    pdfHeight = pdfHeight * scale;
-}
+// Scale the image to fill the entire page
+const widthRatio = pageWidth / pdfWidth;
+const heightRatio = pageHeight / pdfHeight;
+const scale = Math.max(widthRatio, heightRatio); // Use max to ensure full coverage
 
-// Ensure image is centered both vertically and horizontally
+pdfWidth = pdfWidth * scale;
+pdfHeight = pdfHeight * scale;
+
+// Calculate the position to ensure the image is centered and fills the page
 const xPos = (pageWidth - pdfWidth) / 2;
-const yPos = (pageHeight - pdfHeight) / 2 + 10; // Adjust this to move the image slightly up or down
+const yPos = (pageHeight - pdfHeight) / 2;
 
-pdf.addImage(imgData, 'JPEG', xPos, yPos, pdfWidth, pdfHeight, undefined, 'SLOW', -rotationDegree);
+pdf.addImage(imgData, 'JPEG', xPos, yPos, pdfWidth, pdfHeight, undefined, 'FAST', rotationDegree);
 
 
 
