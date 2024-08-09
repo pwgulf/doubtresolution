@@ -147,8 +147,8 @@
                 pdf.text(`Subject: ${subject}`, 10, 60);
                 pdf.text(`Doubt in Detail: ${doubtDetail}`, 10, 70);
 
-                // Add the resized image
-                pdf.addImage(imgData, 'JPEG', 10, 80, pdfWidth, pdfHeight);
+                // Add the image exactly as it is
+                pdf.addImage(imgData, 'JPEG', 10, 80, pdfWidth, pdfHeight, '', 'NONE');
 
                 // Add the logo to the top right corner of the first page
                 const logoUrl = '/mnt/data/PW Gulf_White Logo YT.png'; // Replace with the correct path
