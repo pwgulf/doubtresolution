@@ -135,6 +135,13 @@
             pdf.line(10, 205, 200, 205);
             pdf.line(10, 215, 200, 215);
 
+            // Add the logo to the right corner
+            const logoUrl = '/mnt/data/PW Gulf_White Logo YT.png';
+            pdf.addImage(logoUrl, 'PNG', 150, 10, 50, 20);  // Adjust the coordinates and size as needed
+
+            // Add an extra blank page
+            pdf.addPage();
+
             // Convert the PDF to a Blob and trigger download
             const blob = pdf.output('blob');
             const url = URL.createObjectURL(blob);
