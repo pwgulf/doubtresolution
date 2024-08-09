@@ -198,29 +198,32 @@
                 pdf.addImage(logoUrl, 'PNG', pdf.internal.pageSize.getWidth() - 50, 10, 40, 15); // Adjust the coordinates and size as needed
 
                 // Second Page: Image
-                pdf.addPage();
+ pdf.addPage();
 
-                const maxWidth = pdf.internal.pageSize.getWidth() - 20; // Allowing some margin
-                const maxHeight = pdf.internal.pageSize.getHeight() - 20; // Allowing some margin
-                let pdfWidth = imgWidth;
-                let pdfHeight = imgHeight;
+const maxWidth = pdf.internal.pageSize.getWidth() - 40; // Increased margin for more padding
+const maxHeight = pdf.internal.pageSize.getHeight() - 40; // Increased margin for more padding
+let pdfWidth = imgWidth;
+let pdfHeight = imgHeight;
 
-                if (rotationDegree === 90 || rotationDegree === 270) {
-                    [pdfWidth, pdfHeight] = [pdfHeight, pdfWidth];
-                }
+if (rotationDegree === 90 || rotationDegree === 270) {
+    [pdfWidth, pdfHeight] = [pdfHeight, pdfWidth];
+}
 
-                if (pdfWidth > maxWidth || pdfHeight > maxHeight) {
-                    const widthRatio = maxWidth / pdfWidth;
-                    const heightRatio = maxHeight / pdfHeight;
-                    const scale = Math.min(widthRatio, heightRatio);
-                    pdfWidth = pdfWidth * scale;
-                    pdfHeight = pdfHeight * scale;
-                }
+if (pdfWidth > maxWidth || pdfHeight > maxHeight) {
+    const widthRatio = maxWidth / pdfWidth;
+    const heightRatio = maxHeight / pdfHeight;
+    const scale = Math.min(widthRatio, heightRatio);
+    pdfWidth = pdfWidth * scale;
+    pdfHeight = pdfHeight * scale;
+}
 
-                let xPos = (pdf.internal.pageSize.getWidth() - pdfWidth) / 2;
-                let yPos = (pdf.internal.pageSize.getHeight() - pdfHeight) / 2;
+const xPos = (pdf.internal.pageSize.getWidth() - pdfWidth) / 2; // Centering the image horizontally
+const yPos = (pdf.internal.pageSize.getHeight() - pdfHeight) / 2; // Centering the image vertically
 
-                pdf.addImage(imgData, 'JPEG', xPos, yPos, pdfWidth, pdfHeight, undefined, 'SLOW', -rotationDegree);
+pdf.addImage(imgData, 'JPEG', xPos, yPos, pdfWidth, pdfHeight, undefined, 'SLOW', -rotationDegree);
+
+
+               
 
                 // Third Page: Blank
                 pdf.addPage();
