@@ -130,14 +130,14 @@
                 pdf.addImage(imgData, 'JPEG', 10, 80, 180, 100);
             }
 
+            // Add the logo to the top right corner of the first page
+            const logoUrl = '/mnt/data/PW Gulf_White Logo YT.png'; // Replace with the correct path
+            pdf.addImage(logoUrl, 'PNG', 150, 10, 40, 15); // Adjust the coordinates and size as needed
+
             pdf.text('Please solve below:', 10, 190);
             pdf.line(10, 195, 200, 195);  // Adds a line for solving space
             pdf.line(10, 205, 200, 205);
             pdf.line(10, 215, 200, 215);
-
-            // Add the logo to the right corner
-            const logoUrl = '/mnt/data/PW Gulf_White Logo YT.png';
-            pdf.addImage(logoUrl, 'PNG', 150, 10, 50, 20);  // Adjust the coordinates and size as needed
 
             // Add an extra blank page
             pdf.addPage();
