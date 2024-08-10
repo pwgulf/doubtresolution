@@ -117,47 +117,61 @@
         reader.onload = function(e) {
             const imgData = e.target.result;
 
-            const img = new Image();
-            img.src = imgData;
-            img.onload = function() {
-                const pdf = new jsPDF({
-                    orientation: 'portrait',
-                    unit: 'mm',
-                    format: 'a3'
-                });
+ const img = new Image();
+img.src = imgData;
+img.onload = function() {
+    const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a3'
+    });
 
-                // Add text details
-                pdf.setFontSize(12);
-                pdf.text(`Name: ${name}`, 10, 10);
-                pdf.text(`Country Code: ${countryCode}`, 10, 20);
-                pdf.text(`Number: ${number}`, 10, 30);
-                pdf.text(`Batch: ${batch}`, 10, 40);
-                pdf.text(`Section: ${section}`, 10, 50);
-                pdf.text(`Subject: ${subject}`, 10, 60);
-                pdf.text(`Doubt in Detail: ${doubtDetail}`, 10, 70);
+    // Add text details
+    pdf.setFontSize(12);
+    pdf.text(`Name: ${name}`, 10, 10);
+    pdf.text(`Country Code: ${countryCode}`, 10, 20);
+    pdf.text(`Number: ${number}`, 10, 30);
+    pdf.text(`Batch: ${batch}`, 10, 40);
+    pdf.text(`Section: ${section}`, 10, 50);
+    pdf.text(`Subject: ${subject}`, 10, 60);
+    pdf.text(`Doubt in Detail: ${doubtDetail}`, 10, 70);
 
-                let imgWidth = img.width;
-                let imgHeight = img.height;
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
 
-                const pageWidth = pdf.internal.pageSize.getWidth() - 20; // Leave some margin
-                const pageHeight = pdf.internal.pageSize.getHeight() - 80; // Leave space for text
+    const imgWidth = img.width;
+    const imgHeight = img.height;
 
-                // Add the image to the PDF
-                if (imgHeight <= pageHeight && imgWidth <= pageWidth) {
-                    pdf.addImage(imgData, 'JPEG', 10, 80, imgWidth, imgHeight);
-                } else {
-                    pdf.addPage();
-                    pdf.addImage(imgData, 'JPEG', 10, 10, imgWidth, imgHeight);
-                }
+    let aspectRatio = imgWidth / imgHeight;
+    let pdfWidth, pdfHeight;
 
-                // Trigger PDF download
-                const blob = pdf.output('blob');
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `${name}_question.pdf`;
-                a.click();
-                URL.revokeObjectURL(url); // Clean up
+    if (aspectRatio > 1) { // Landscape Image
+        pdfWidth = pageWidth - 20;
+        pdfHeight = pdfWidth / aspectRatio;
+    } else { // Portrait Image
+        pdfHeight = pageHeight - 80;
+        pdfWidth = pdfHeight * aspectRatio;
+    }
+
+    if (pdfHeight > pageHeight) {
+        pdf.addPage();
+        pdfHeight = pageHeight - 20;
+        pdfWidth = pdfHeight * aspectRatio;
+    }
+
+    // Add image to PDF, fitting into the page
+    pdf.addImage(imgData, 'JPEG', 10, 80, pdfWidth, pdfHeight);
+
+    // Trigger PDF download
+    const blob = pdf.output('blob');
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${name}_question.pdf`;
+    a.click();
+    URL.revokeObjectURL(url); // Clean up
+};
+
             };
         };
         reader.readAsDataURL(imageFile);
