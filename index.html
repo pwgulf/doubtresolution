@@ -5,114 +5,53 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generate Question PDF</title>
     <style>
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background-color: #f4f4f4;
-}
-
-.container {
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 400px; /* Increased max-width for better layout on larger screens */
-    box-sizing: border-box;
-}
-
-.container h1 {
-    font-size: 24px;
-    margin-bottom: 20px;
-    text-align: center; /* Centered heading */
-}
-
-.form-group {
-    margin-bottom: 15px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold; /* Added bold font for better readability */
-}
-
-.form-group input[type="text"], 
-.form-group input[type="file"], 
-.form-group input[type="checkbox"] {
-    width: 100%;
-    padding: 8px;
-    box-sizing: border-box;
-    border: 1px solid #ddd; /* Added border for better input visibility */
-    border-radius: 4px;
-}
-
-.form-group input[type="file"] {
-    padding: 3px; /* Reduced padding for file input */
-}
-
-.form-group input[type="submit"] {
-    width: 100%;
-    padding: 12px; /* Slightly increased padding for better touch targets */
-    background-color: #007bff;
-    border: none;
-    color: white;
-    font-size: 16px;
-    cursor: pointer;
-    border-radius: 4px;
-    transition: background-color 0.3s ease; /* Smooth transition for hover effect */
-}
-
-.form-group input[type="submit"]:hover {
-    background-color: #0056b3;
-}
-
-#previewContainer {
-    display: none;
-    margin-top: 20px;
-    text-align: center;
-}
-
-#previewImage {
-    max-width: 100%;
-    height: auto;
-    transform-origin: center;
-    margin: 0 auto; /* Center image horizontally */
-    display: block; /* Ensure the image is a block element */
-}
-
-#rotateButton, #sendButton {
-    display: none;
-    margin-top: 10px;
-    padding: 10px 20px;
-    background-color: #ff7f50;
-    border: none;
-    color: white;
-    font-size: 16px;
-    cursor: pointer;
-    border-radius: 4px;
-    width: calc(100% - 40px); /* Ensure buttons do not overflow */
-    margin: 10px auto; /* Center buttons */
-    transition: background-color 0.3s ease; /* Smooth transition for hover effect */
-}
-
-#sendButton {
-    background-color: #28a745;
-}
-
-#rotateButton:hover {
-    background-color: #ff4500;
-}
-
-#sendButton:hover {
-    background-color: #218838;
-}
-</style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+        .container h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input[type="text"], .form-group input[type="file"] {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        .form-group input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .form-group input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
 
@@ -152,43 +91,18 @@ body {
             <input type="file" id="image" accept="image/*" required>
         </div>
         <div class="form-group">
-            <input type="button" id="previewButton" value="Generate Preview">
+            <input type="submit" value="Generate PDF">
         </div>
     </form>
 </div>
 
-<div id="previewContainer">
-    <h2>Preview</h2>
-    <img id="previewImage" src="" alt="Image Preview">
-    <button id="rotateButton">Rotate Image 90°</button>
-    <button id="sendButton">Send and Download PDF</button>
-</div>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exif-js/2.3.0/exif.min.js"></script>
+
 <script>
-    let rotationDegree = 0;
+    document.getElementById('questionForm').addEventListener('submit', function(event) {
+        event.preventDefault();
 
-    document.getElementById('previewButton').addEventListener('click', function(event) {
-        const imageFile = document.getElementById('image').files[0];
-
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const imgData = e.target.result;
-            const previewImage = document.getElementById('previewImage');
-            previewImage.src = imgData;
-            document.getElementById('previewContainer').style.display = 'block';
-            document.getElementById('rotateButton').style.display = 'inline-block';
-            document.getElementById('sendButton').style.display = 'inline-block';
-        };
-        reader.readAsDataURL(imageFile);
-    });
-
-    document.getElementById('rotateButton').addEventListener('click', function(event) {
-        rotationDegree = (rotationDegree + 90) % 360;
-        document.getElementById('previewImage').style.transform = `rotate(${rotationDegree}deg)`;
-    });
-
-    document.getElementById('sendButton').addEventListener('click', function(event) {
         const { jsPDF } = window.jspdf;
 
         const name = document.getElementById('name').value;
@@ -204,74 +118,90 @@ body {
         reader.onload = function(e) {
             const imgData = e.target.result;
 
-            const img = new Image();
-            img.src = imgData;
-            img.onload = function() {
-                const imgWidth = img.width;
-                const imgHeight = img.height;
+            // Correct orientation using EXIF data
+            EXIF.getData(imageFile, function() {
+                const orientation = EXIF.getTag(this, "Orientation");
 
-                let pdf = new jsPDF();
+                const img = new Image();
+                img.src = imgData;
+                img.onload = function() {
+                    let canvas = document.createElement('canvas');
+                    let ctx = canvas.getContext('2d');
 
-                // First Page: Text Details
-                pdf.setFontSize(12);
-                pdf.text(`Name: ${name}`, 10, 10);
-                pdf.text(`Country Code: ${countryCode}`, 10, 20);
-                pdf.text(`Number: ${number}`, 10, 30);
-                pdf.text(`Batch: ${batch}`, 10, 40);
-                pdf.text(`Section: ${section}`, 10, 50);
-                pdf.text(`Subject: ${subject}`, 10, 60);
-                pdf.text(`Doubt in Detail: ${doubtDetail}`, 10, 70);
+                    if (orientation > 4) {
+                        canvas.width = img.height;
+                        canvas.height = img.width;
+                    } else {
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                    }
 
-                // Add the logo to the top right corner of the first page
-                const logoUrl = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSZQ1weZmDB9mUB7UEieqPS3YcFG0GxSoTcfCFfzkQZBWTEg69UJgLvmC_81iC8ad9GDA&usqp=CAU'; // Replace with the correct path
-                pdf.addImage(logoUrl, 'PNG', pdf.internal.pageSize.getWidth() - 50, 10, 40, 15); // Adjust the coordinates and size as needed
+                    // Apply transformation for orientation
+                    switch (orientation) {
+                        case 2: ctx.transform(-1, 0, 0, 1, img.width, 0); break;
+                        case 3: ctx.transform(-1, 0, 0, -1, img.width, img.height); break;
+                        case 4: ctx.transform(1, 0, 0, -1, 0, img.height); break;
+                        case 5: ctx.transform(0, 1, 1, 0, 0, 0); break;
+                        case 6: ctx.transform(0, 1, -1, 0, img.height , 0); break;
+                        case 7: ctx.transform(0, -1, -1, 0, img.height , img.width); break;
+                        case 8: ctx.transform(0, -1, 1, 0, 0, img.width); break;
+                        default: ctx.drawImage(img, 0, 0); break;
+                    }
 
-                // Second Page: Image
-pdf.addPage();
+                    if (orientation >= 2 && orientation <= 8) {
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    }
 
-const maxWidth = pdf.internal.pageSize.getWidth() - 40; // Increased margin for more padding
-const maxHeight = pdf.internal.pageSize.getHeight() - 40; // Increased margin for more padding
-let pdfWidth = imgWidth;
-let pdfHeight = imgHeight;
+                    // Resized dimensions
+                    const imgWidth = canvas.width;
+                    const imgHeight = canvas.height;
 
-if (rotationDegree === 90 || rotationDegree === 270) {
-    [pdfWidth, pdfHeight] = [pdfHeight, pdfWidth];
-}
+                    const maxWidth = 180; // Max width for the image in PDF
+                    const maxHeight = 100; // Max height for the image in PDF
+                    let pdfWidth = imgWidth;
+                    let pdfHeight = imgHeight;
 
-if (pdfWidth > maxWidth || pdfHeight > maxHeight) {
-    const widthRatio = maxWidth / pdfWidth;
-    const heightRatio = maxHeight / pdfHeight;
-    const scale = Math.min(widthRatio, heightRatio);
-    pdfWidth = pdfWidth * scale;
-    pdfHeight = pdfHeight * scale;
-}
+                    // Resize maintaining the aspect ratio
+                    if (imgWidth > maxWidth || imgHeight > maxHeight) {
+                        const widthRatio = maxWidth / imgWidth;
+                        const heightRatio = maxHeight / imgHeight;
+                        const scale = Math.min(widthRatio, heightRatio);
+                        pdfWidth = imgWidth * scale;
+                        pdfHeight = imgHeight * scale;
+                    }
 
-// Adjust the xPos and yPos to shift the image slightly towards the right and up
-const xPos = (pdf.internal.pageSize.getWidth() - pdfWidth) / 2 + 10; // Shift right by 10 units
-const yPos = (pdf.internal.pageSize.getHeight() - pdfHeight) / 2 - 10; // Shift up by 10 units
+                    // Create the PDF and add the image
+                    const pdf = new jsPDF();
+                    pdf.setFontSize(12);
+                    pdf.text(`Name: ${name}`, 10, 10);
+                    pdf.text(`Country Code: ${countryCode}`, 10, 20);
+                    pdf.text(`Number: ${number}`, 10, 30);
+                    pdf.text(`Batch: ${batch}`, 10, 40);
+                    pdf.text(`Section: ${section}`, 10, 50);
+                    pdf.text(`Subject: ${subject}`, 10, 60);
+                    pdf.text(`Doubt in Detail: ${doubtDetail}`, 10, 70);
 
-pdf.addImage(imgData, 'JPEG', xPos, yPos, pdfWidth, pdfHeight, undefined, 'SLOW', -rotationDegree);
+                    // Add the resized image
+                    pdf.addImage(canvas.toDataURL('image/jpeg'), 'JPEG', 10, 80, pdfWidth, pdfHeight);
 
+                    // Additional PDF content (e.g., logo, lines for writing, etc.)
+                    pdf.text('Please solve below:', 10, 190);
+                    pdf.line(10, 195, 200, 195);  // Adds a line for solving space
+                    pdf.line(10, 205, 200, 205);
+                    pdf.line(10, 215, 200, 215);
+                    
+                    pdf.addPage();
 
-
-
-
-
-
-               
-
-                // Third Page: Blank
-                pdf.addPage();
-
-                // Convert the PDF to a Blob and trigger download
-                const blob = pdf.output('blob');
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `${name}_question.pdf`;
-                a.click();
-                URL.revokeObjectURL(url); // Clean up
-            };
+                    // Trigger PDF download
+                    const blob = pdf.output('blob');
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${name}_question.pdf`;
+                    a.click();
+                    URL.revokeObjectURL(url); // Clean up
+                };
+            });
         };
         reader.readAsDataURL(imageFile);
     });
