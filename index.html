@@ -5,110 +5,114 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generate Question PDF</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f4f4f4;
-        }
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f4f4f4;
+}
 
-        .container {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 400px;
-            box-sizing: border-box;
-        }
+.container {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px; /* Increased max-width for better layout on larger screens */
+    box-sizing: border-box;
+}
 
-        .container h1 {
-            font-size: 24px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
+.container h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    text-align: center; /* Centered heading */
+}
 
-        .form-group {
-            margin-bottom: 15px;
-        }
+.form-group {
+    margin-bottom: 15px;
+}
 
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold; /* Added bold font for better readability */
+}
 
-        .form-group input[type="text"],
-        .form-group input[type="file"] {
-            width: 100%;
-            padding: 8px;
-            box-sizing: border-box;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
+.form-group input[type="text"], 
+.form-group input[type="file"], 
+.form-group input[type="checkbox"] {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+    border: 1px solid #ddd; /* Added border for better input visibility */
+    border-radius: 4px;
+}
 
-        .form-group input[type="submit"] {
-            width: 100%;
-            padding: 12px;
-            background-color: #007bff;
-            border: none;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-            border-radius: 4px;
-            transition: background-color 0.3s ease;
-        }
+.form-group input[type="file"] {
+    padding: 3px; /* Reduced padding for file input */
+}
 
-        .form-group input[type="submit"]:hover {
-            background-color: #0056b3;
-        }
+.form-group input[type="submit"] {
+    width: 100%;
+    padding: 12px; /* Slightly increased padding for better touch targets */
+    background-color: #007bff;
+    border: none;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+}
 
-        #previewContainer {
-            display: none;
-            margin-top: 20px;
-            text-align: center;
-        }
+.form-group input[type="submit"]:hover {
+    background-color: #0056b3;
+}
 
-        #previewImage {
-            max-width: 100%;
-            height: auto;
-            transform-origin: center;
-            margin: 0 auto;
-            display: block;
-        }
+#previewContainer {
+    display: none;
+    margin-top: 20px;
+    text-align: center;
+}
 
-        #rotateButton,
-        #sendButton {
-            display: none;
-            margin-top: 10px;
-            padding: 10px 20px;
-            background-color: #ff7f50;
-            border: none;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-            border-radius: 4px;
-            width: calc(100% - 40px);
-            margin: 10px auto;
-            transition: background-color 0.3s ease;
-        }
+#previewImage {
+    max-width: 100%;
+    height: auto;
+    transform-origin: center;
+    margin: 0 auto; /* Center image horizontally */
+    display: block; /* Ensure the image is a block element */
+}
 
-        #sendButton {
-            background-color: #28a745;
-        }
+#rotateButton, #sendButton {
+    display: none;
+    margin-top: 10px;
+    padding: 10px 20px;
+    background-color: #ff7f50;
+    border: none;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 4px;
+    width: calc(100% - 40px); /* Ensure buttons do not overflow */
+    margin: 10px auto; /* Center buttons */
+    transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+}
 
-        #rotateButton:hover {
-            background-color: #ff4500;
-        }
+#sendButton {
+    background-color: #28a745;
+}
 
-        #sendButton:hover {
-            background-color: #218838;
-        }
-    </style>
+#rotateButton:hover {
+    background-color: #ff4500;
+}
+
+#sendButton:hover {
+    background-color: #218838;
+}
+</style>
 </head>
 <body>
 
@@ -219,35 +223,45 @@
                 pdf.text(`Doubt in Detail: ${doubtDetail}`, 10, 70);
 
                 // Add the logo to the top right corner of the first page
-                const logoUrl = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSZQ1weZmDB9mUB7UEieqPS3YcFG0GxSoTcfCFfzkQZBWTEg69UJgLvmC_81iC8ad9GDA&usqp=CAU';
-                pdf.addImage(logoUrl, 'PNG', pdf.internal.pageSize.getWidth() - 50, 10, 40, 15);
+                const logoUrl = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSZQ1weZmDB9mUB7UEieqPS3YcFG0GxSoTcfCFfzkQZBWTEg69UJgLvmC_81iC8ad9GDA&usqp=CAU'; // Replace with the correct path
+                pdf.addImage(logoUrl, 'PNG', pdf.internal.pageSize.getWidth() - 50, 10, 40, 15); // Adjust the coordinates and size as needed
 
                 // Second Page: Image
+pdf.addPage();
+
+const maxWidth = pdf.internal.pageSize.getWidth() - 40; // Increased margin for more padding
+const maxHeight = pdf.internal.pageSize.getHeight() - 40; // Increased margin for more padding
+let pdfWidth = imgWidth;
+let pdfHeight = imgHeight;
+
+if (rotationDegree === 90 || rotationDegree === 270) {
+    [pdfWidth, pdfHeight] = [pdfHeight, pdfWidth];
+}
+
+if (pdfWidth > maxWidth || pdfHeight > maxHeight) {
+    const widthRatio = maxWidth / pdfWidth;
+    const heightRatio = maxHeight / pdfHeight;
+    const scale = Math.min(widthRatio, heightRatio);
+    pdfWidth = pdfWidth * scale;
+    pdfHeight = pdfHeight * scale;
+}
+
+// Adjust the xPos and yPos to shift the image slightly towards the right and up
+const xPos = (pdf.internal.pageSize.getWidth() - pdfWidth) / 2 + 10; // Shift right by 10 units
+const yPos = (pdf.internal.pageSize.getHeight() - pdfHeight) / 2 - 10; // Shift up by 10 units
+
+pdf.addImage(imgData, 'JPEG', xPos, yPos, pdfWidth, pdfHeight, undefined, 'SLOW', -rotationDegree);
+
+
+
+
+
+
+
+               
+
+                // Third Page: Blank
                 pdf.addPage();
-
-                const maxWidth = pdf.internal.pageSize.getWidth() - 40;
-                const maxHeight = pdf.internal.pageSize.getHeight() - 40;
-                let pdfWidth = imgWidth;
-                let pdfHeight = imgHeight;
-
-                // Adjust dimensions based on rotation
-                if (rotationDegree === 90 || rotationDegree === 270) {
-                    [pdfWidth, pdfHeight] = [pdfHeight, pdfWidth];
-                }
-
-                // Scale down image if it's too large for the page
-                if (pdfWidth > maxWidth || pdfHeight > maxHeight) {
-                    const widthRatio = maxWidth / pdfWidth;
-                    const heightRatio = maxHeight / pdfHeight;
-                    const scale = Math.min(widthRatio, heightRatio);
-                    pdfWidth = pdfWidth * scale;
-                    pdfHeight = pdfHeight * scale;
-                }
-
-                const xPos = (pdf.internal.pageSize.getWidth() - pdfWidth) / 2;
-                const yPos = (pdf.internal.pageSize.getHeight() - pdfHeight) / 2;
-
-                pdf.addImage(imgData, 'JPEG', xPos, yPos, pdfWidth, pdfHeight, undefined, 'FAST', rotationDegree);
 
                 // Convert the PDF to a Blob and trigger download
                 const blob = pdf.output('blob');
@@ -256,7 +270,7 @@
                 a.href = url;
                 a.download = `${name}_question.pdf`;
                 a.click();
-                URL.revokeObjectURL(url);
+                URL.revokeObjectURL(url); // Clean up
             };
         };
         reader.readAsDataURL(imageFile);
