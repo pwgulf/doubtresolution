@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generate Question PDF</title>
     <style>
+        /* Your original styles with minimal adjustments for clarity */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -15,7 +16,6 @@
             height: 100vh;
             background-color: #f4f4f4;
         }
-
         .container {
             background: white;
             padding: 20px;
@@ -25,37 +25,27 @@
             max-width: 400px;
             box-sizing: border-box;
         }
-
         .container h1 {
             font-size: 24px;
             margin-bottom: 20px;
             text-align: center;
         }
-
         .form-group {
             margin-bottom: 15px;
         }
-
         .form-group label {
             display: block;
             margin-bottom: 5px;
             font-weight: bold;
         }
-
         .form-group input[type="text"],
-        .form-group input[type="file"],
-        .form-group input[type="checkbox"] {
+        .form-group input[type="file"] {
             width: 100%;
             padding: 8px;
             box-sizing: border-box;
             border: 1px solid #ddd;
             border-radius: 4px;
         }
-
-        .form-group input[type="file"] {
-            padding: 3px;
-        }
-
         .form-group input[type="submit"] {
             width: 100%;
             padding: 12px;
@@ -67,17 +57,14 @@
             border-radius: 4px;
             transition: background-color 0.3s ease;
         }
-
         .form-group input[type="submit"]:hover {
             background-color: #0056b3;
         }
-
         #previewContainer {
             display: none;
             margin-top: 20px;
             text-align: center;
         }
-
         #previewImage {
             max-width: 100%;
             height: auto;
@@ -85,7 +72,6 @@
             margin: 0 auto;
             display: block;
         }
-
         #rotateButton,
         #sendButton {
             display: none;
@@ -101,15 +87,12 @@
             margin: 10px auto;
             transition: background-color 0.3s ease;
         }
-
         #sendButton {
             background-color: #28a745;
         }
-
         #rotateButton:hover {
             background-color: #ff4500;
         }
-
         #sendButton:hover {
             background-color: #218838;
         }
@@ -230,8 +213,8 @@
                 // Second Page: Image
                 pdf.addPage();
 
-                const maxWidth = pdf.internal.pageSize.getWidth() - 40; // Margin
-                const maxHeight = pdf.internal.pageSize.getHeight() - 40; // Margin
+                const maxWidth = pdf.internal.pageSize.getWidth() - 20; // Slightly larger margin
+                const maxHeight = pdf.internal.pageSize.getHeight() - 20; // Slightly larger margin
                 let pdfWidth = imgWidth;
                 let pdfHeight = imgHeight;
 
@@ -239,6 +222,7 @@
                     [pdfWidth, pdfHeight] = [pdfHeight, pdfWidth];
                 }
 
+                // Scaling the image
                 if (pdfWidth > maxWidth || pdfHeight > maxHeight) {
                     const widthRatio = maxWidth / pdfWidth;
                     const heightRatio = maxHeight / pdfHeight;
@@ -250,10 +234,7 @@
                 const xPos = (pdf.internal.pageSize.getWidth() - pdfWidth) / 2;
                 const yPos = (pdf.internal.pageSize.getHeight() - pdfHeight) / 2;
 
-                pdf.addImage(imgData, 'JPEG', xPos, yPos, pdfWidth, pdfHeight, undefined, 'SLOW', -rotationDegree);
-
-                // Third Page: Blank
-                pdf.addPage();
+                pdf.addImage(imgData, 'JPEG', xPos, yPos, pdfWidth, pdfHeight, undefined, 'FAST', rotationDegree);
 
                 // Convert the PDF to a Blob and trigger download
                 const blob = pdf.output('blob');
